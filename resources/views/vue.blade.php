@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quiz - 2</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
@@ -15,7 +16,7 @@
         <button v-if="clicked === true" v-on:click="update">Update</button>
 
         <ul>
-            <li v-for="(info, index) in infos"> {{info.name}}
+            <li v-for="(info, index) in infos"> @{{info.name}}
                 <button v-on:click="edit(index)">Edit</button>
                 ||
                 <button v-on:click="delete(index)">Delete</button>
@@ -29,16 +30,7 @@
             el: '#quizVue',
             data: {
                 iArray: 0,
-                infos: [{
-                        name: 'Muhammad Iqbal Mubarok'
-                    },
-                    {
-                        name: 'Ruby Purwanti'
-                    },
-                    {
-                        name: 'Faqih Muhammad'
-                    },
-                ],
+                infos: [],
                 clicked: false,
                 username: '',
             },
@@ -46,18 +38,20 @@
                 add: function() {
                     input = document.getElementById('showData').value;
                     if (input != '') {
-                        dataQuiz.infos.push({
-                            name: input
+                        axios.post(`api/users`, {name: input})
+                            .then(response => {
+                                this.infos.unshift({name: input});
+
                         })
                         dataQuiz.username = '';
                     } else {
                         confirm("Sorry, there's no data")
                     }
                 },
-                delete: function(index) {
-                    if (confirm("Are you sure ?")) {
-                        dataQuiz.infos.splice(index, 1);
-                    }
+                delete: function(index, user) {
+                        if (confirm("Are you sure ?")) {
+
+                }
                 },
                 edit: function(index) {
                     dataQuiz.iArray = index;
@@ -70,7 +64,12 @@
                     dataQuiz.username = '';
                     dataQuiz.clicked = false;
                 },
+            mounted() {
+                axios.get('api/users').then(response => this.infos = response.data.users);
+                console.log('response');
             }
+}
+
         });
     </script>
 
