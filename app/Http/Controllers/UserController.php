@@ -5,7 +5,8 @@
 namespace App\Http\Controllers;
 
 use App\User;
-use App\Http\Resources\UserResource;
+use App\Http\Resources\UserResource as UserResource;
+
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -47,9 +48,9 @@ class UserController extends Controller
     {
         //
         $user = User::create([
-            'name' => $request->name,
+            'name' => $request->name
         ]);
-        $addUser = new User($user);
+        $addUser = new UserResource($user);
         return response()->json([
             'response_code' => '00',
             'response_message' => 'User telah ditambahkan',

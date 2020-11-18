@@ -17,9 +17,9 @@
 
         <ul>
             <li v-for="(info, index) in infos"> @{{info.name}}
-                <button v-on:click="edit(index)">Edit</button>
+                <button v-on:click="edit(index,info)">Edit</button>
                 ||
-                <button v-on:click="delete(index)">Delete</button>
+                <button v-on:click="hapus(index,info)">Delete</button>
             </li>
         </ul>
 
@@ -33,6 +33,7 @@
                 infos: [],
                 clicked: false,
                 username: '',
+                idUser:'',
             },
             methods: {
                 add: function() {
@@ -40,35 +41,43 @@
                     if (input != '') {
                         axios.post(`api/users`, {name: input})
                             .then(response => {
-                                this.infos.unshift({name: input});
-
+                                axios.get('api/users').then(response => this.infos = response.data.users);
                         })
                         dataQuiz.username = '';
                     } else {
                         confirm("Sorry, there's no data")
                     }
                 },
-                delete: function(index, user) {
-                        if (confirm("Are you sure ?")) {
-
-                }
+                hapus: function(index, info) {
+                    if (confirm("Are you sure ?")) {
+                        axios.delete(`api/users/delete/` + info.id)
+                        .then(response => {
+                            axios.get('api/users').then(response => this.infos = response.data.users);
+                        console.log(response.data);
+                        })
+                    }
                 },
-                edit: function(index) {
+                edit: function(index,info) {
+                    dataQuiz.idUser = info.id;
                     dataQuiz.iArray = index;
                     dataQuiz.username = dataQuiz.infos[index].name;
                     dataQuiz.clicked = true;
+                    console.log(dataQuiz.idUser)
                 },
                 update: function() {
                     input = document.getElementById('showData').value;
+                    axios.post(`api/users/update/` + dataQuiz.idUser, {name: input})
+                    .then(response => {
+                        axios.get('api/users').then(response => this.infos = response.data.users);
+                    })
                     dataQuiz.infos[dataQuiz.iArray].name = input;
                     dataQuiz.username = '';
                     dataQuiz.clicked = false;
                 },
+            },
             mounted() {
                 axios.get('api/users').then(response => this.infos = response.data.users);
-                console.log('response');
             }
-}
 
         });
     </script>
